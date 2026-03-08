@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#EC407A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="恋爱储蓄罐">
+    <meta name="description" content="记录我们的每一份心动，见证爱情成长">
+    <title>💖 恋爱亲密储蓄罐</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div id="login-register-modal" class="modal show">
+            <div class="modal-content login-modal">
+                <div class="app-logo-login">
+                    <img src="logo.png" alt="恋爱亲密储蓄罐" class="logo-image">
+                </div>
+                <h3 class="modal-title">💖 恋爱亲密储蓄罐</h3>
+                <div class="login-tabs">
+                    <button id="login-tab" class="login-tab active" onclick="switchLoginTab('login')">登录</button>
+                    <button id="register-tab" class="login-tab" onclick="switchLoginTab('register')">注册</button>
+                </div>
+                
+                <div id="login-form" class="login-form active">
+                    <div class="form-group">
+                        <label>账号（手机号/微信/QQ）</label>
+                        <input type="text" id="login-account" placeholder="请输入账号">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="login-password" placeholder="请输入密码">
+                    </div>
+                    <button class="submit-btn" onclick="handleLogin()">登录</button>
+                </div>
+                
+                <div id="register-form" class="login-form">
+                    <div class="form-group">
+                        <label>账号（手机号/微信/QQ）</label>
+                        <input type="text" id="register-account" placeholder="请输入账号">
+                    </div>
+                    <div class="form-group">
+                        <label>昵称</label>
+                        <input type="text" id="register-nickname" placeholder="请输入昵称">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="register-password" placeholder="请输入密码">
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" id="register-confirm" placeholder="请再次输入密码">
+                    </div>
+                    <button class="submit-btn" onclick="handleRegister()">注册</button>
+                </div>
+            </div>
+        </div>
+
+        <header class="app-header">
+            <div class="user-switch">
+                <span id="current-user" class="current-user-label">👤 未登录</span>
+                <button id="logout-btn" class="switch-btn" onclick="handleLogout()">退出</button>
+            </div>
+            <h1>💖 恋爱亲密储蓄罐</h1>
+            <div class="level-display">
+                <span id="level-name" class="level-name">初遇心动</span>
+                <div class="level-bar">
+                    <div id="level-progress" class="level-progress" style="width: 0%"></div>
+                </div>
+                <span id="intimacy-score" class="intimacy-score">0 / 200</span>
+            </div>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('home')">🏠 首页</button>
+            <button class="nav-tab" onclick="switchTab('tasks')">🎯 任务 <span id="task-badge" class="unread-badge" style="display: none;">!</span></button>
+            <button class="nav-tab" onclick="switchTab('calendar')">📆 日历</button>
+            <button class="nav-tab" onclick="switchTab('messages')">💬 消息 <span id="unread-badge" class="unread-badge">0</span></button>
+            <button class="nav-tab" onclick="switchTab('savings')">💰 储蓄</button>
+            <button class="nav-tab" onclick="switchTab('anniversary')">🎀 纪念日</button>
+            <button class="nav-tab" onclick="switchTab('profile')">👤 我的</button>
+            <button class="nav-tab" onclick="switchTab('timeline')">📅 时光轴</button>
+        </nav>
+
+        <main class="content" id="page-content">
+        </main>
+
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <template id="template-home">
+<div id="today-panel" class="today-panel">
+    <h3>🔔 今日事项</h3>
+    <div id="today-items" class="today-items"></div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon">🌸</div>
+        <div class="stat-label">思念储蓄</div>
+        <div id="miss-count" class="stat-value">0</div>
+        </div>
+    <div class="stat-card">
+        <div class="stat-icon">💭</div>
+        <div class="stat-label">情绪储蓄</div>
+        <div id="emotion-count" class="stat-value">0</div>
+        </div>
+    <div class="stat-card">
+        <div class="stat-icon">✨</div>
+        <div class="stat-label">幸福储蓄</div>
+        <div id="happiness-count" class="stat-value">0</div>
+        </div>
+    <div class="stat-card">
+        <div class="stat-icon">💝</div>
+        <div class="stat-label">和解次数</div>
+        <div id="reconcile-count" class="stat-value">0</div>
+        </div>
+</div>
+
+<div class="welcome-card">
+    <h2>今天，你想TA了吗？</h2>
+    <div class="checkin-section">
+        <button id="checkin-btn" class="checkin-btn" onclick="handleCheckin()">💕</button>
+        <p id="checkin-status" class="checkin-status">今日未签到</p>
+        </div>
+</div>
+
+<div class="love-quote">
+    <p id="quote-text">"双向奔赴的爱，才最有意义"</p>
+</div>
+    </template>
+
+    <template id="template-tasks">
+<div class="welcome-card">
+    <h2>💕 今日情侣任务</h2>
+    <p style="color: #7a5a5a; margin-top: 10px;">双方确认完成，才能获得亲密度哦！</p>
+</div>
+
+<div id="tasks-list" class="savings-menu">
+</div>
+    </template>
+
+    <template id="template-calendar">
+<div class="calendar-header">
+    <button class="calendar-nav" onclick="prevMonth()">◀ 上月</button>
+    <span id="calendar-title" class="calendar-title">2024年1月</span>
+    <button class="calendar-nav" onclick="nextMonth()">下月 ▶</button>
+</div>
+<div id="calendar-grid" class="calendar-grid"></div>
+<div class="calendar-legend">
+    <div class="legend-item">
+        <span class="legend-box today-box"></span>
+        <span>今天</span>
+        </div>
+    <div class="legend-item">
+        <span class="legend-box checked-box"></span>
+        <span>已签到</span>
+        </div>
+    <div class="legend-item">
+        <span class="legend-box anniversary-box"></span>
+        <span>纪念日</span>
+        </div>
+</div>
+    </template>
+
+    <template id="template-messages">
+<div id="messages-list" class="messages-list"></div>
+    </template>
+
+    <template id="template-savings">
+<div class="savings-menu">
+    <button class="savings-btn" onclick="openMissForm()">🌸 思念储蓄</button>
+    <button class="savings-btn" onclick="openEmotionForm()">💭 情绪储蓄</button>
+    <button class="savings-btn" onclick="openHappinessForm()">✨ 幸福储蓄</button>
+    <button class="savings-btn" onclick="openConflictForm()">⚔️ 吵架分析</button>
+    <button class="savings-btn" onclick="openReconcileForm()">💝 和解确认</button>
+    <button class="savings-btn" onclick="openAchievements()">🏆 我的成就</button>
+    <button class="savings-btn" onclick="openBackupForm()">💾 数据管理</button>
+</div>
+    </template>
+
+    <template id="template-anniversary">
+<div class="anniversary-header">
+    <h3>📅 重要纪念日</h3>
+    <button class="add-btn" onclick="openAddAnniversary()">+ 添加</button>
+</div>
+<div id="anniversary-list" class="anniversary-list"></div>
+    </template>
+
+    <template id="template-profile">
+<div class="profile-card">
+    <div class="profile-avatar" id="profile-avatar">👤</div>
+    <div class="profile-info">
+        <h3 id="profile-nickname">用户昵称</h3>
+        <p id="profile-account" class="profile-account">账号信息</p>
+        </div>
+</div>
+
+<div class="profile-stats">
+    <div class="profile-stat">
+        <span class="profile-stat-value" id="profile-intimacy">0</span>
+        <span class="profile-stat-label">亲密度</span>
+        </div>
+    <div class="profile-stat">
+        <span class="profile-stat-value" id="profile-level">1</span>
+        <span class="profile-stat-label">等级</span>
+        </div>
+    <div class="profile-stat">
+        <span class="profile-stat-value" id="profile-records">0</span>
+        <span class="profile-stat-label">记录数</span>
+        </div>
+</div>
+
+<div class="profile-menu">
+    <button class="profile-btn" onclick="openEditProfile()">✏️ 编辑资料</button>
+    <button class="profile-btn" onclick="openPartnerBind()">💕 绑定伴侣</button>
+    <button class="profile-btn" onclick="openBackupForm()">💾 数据管理</button>
+</div>
+    </template>
+
+    <template id="template-timeline">
+<div style="margin-bottom: 20px;">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px;">
+        <button class="timeline-filter active" onclick="filterTimeline('all')">全部</button>
+        <button class="timeline-filter" onclick="filterTimeline('checkin')">🌸 思念</button>
+        <button class="timeline-filter" onclick="filterTimeline('happiness')">✨ 幸福</button>
+        <button class="timeline-filter" onclick="filterTimeline('emotion')">💭 情绪</button>
+        <button class="timeline-filter" onclick="filterTimeline('conflict')">⚔️ 吵架</button>
+        <button class="timeline-filter" onclick="filterTimeline('reconcile')">💝 和解</button>
+        <button class="timeline-filter" onclick="filterTimeline('coupleTask')">🎯 任务</button>
+        </div>
+</div>
+<div id="timeline-list" class="timeline-list"></div>
+    </template>
+
+</body>
+</html>

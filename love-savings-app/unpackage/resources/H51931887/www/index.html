@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#EC407A">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="恋爱储蓄罐">
+    <meta name="description" content="记录我们的每一份心动，见证爱情成长">
+    <title>💖 恋爱亲密储蓄罐</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <div id="login-register-modal" class="modal show">
+            <div class="modal-content login-modal">
+                <div class="app-logo-login">
+                    <img src="logo.png" alt="恋爱亲密储蓄罐" class="logo-image">
+                    <div class="logo-emoji">🐷💕</div>
+                </div>
+                <h3 class="modal-title">💖 恋爱亲密储蓄罐</h3>
+                <div class="login-tabs">
+                    <button id="login-tab" class="login-tab active" onclick="switchLoginTab('login')">登录</button>
+                    <button id="register-tab" class="login-tab" onclick="switchLoginTab('register')">注册</button>
+                </div>
+                
+                <div id="login-form" class="login-form active">
+                    <div class="form-group">
+                        <label>账号（手机号/微信/QQ）</label>
+                        <input type="text" id="login-account" placeholder="请输入账号">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="login-password" placeholder="请输入密码">
+                    </div>
+                    <button class="submit-btn" onclick="handleLogin()">登录</button>
+                </div>
+                
+                <div id="register-form" class="login-form">
+                    <div class="form-group">
+                        <label>账号（手机号/微信/QQ）</label>
+                        <input type="text" id="register-account" placeholder="请输入账号">
+                    </div>
+                    <div class="form-group">
+                        <label>昵称</label>
+                        <input type="text" id="register-nickname" placeholder="请输入昵称">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <input type="password" id="register-password" placeholder="请输入密码">
+                    </div>
+                    <div class="form-group">
+                        <label>确认密码</label>
+                        <input type="password" id="register-confirm" placeholder="请再次输入密码">
+                    </div>
+                    <button class="submit-btn" onclick="handleRegister()">注册</button>
+                </div>
+            </div>
+        </div>
+
+        <header class="app-header">
+            <div class="user-switch">
+                <span id="current-user" class="current-user-label">👤 未登录</span>
+                <button id="logout-btn" class="switch-btn" onclick="handleLogout()">退出</button>
+            </div>
+            <h1>💖 恋爱亲密储蓄罐</h1>
+            <div class="level-display">
+                <span id="level-name" class="level-name">初遇心动</span>
+                <div class="level-bar">
+                    <div id="level-progress" class="level-progress" style="width: 0%"></div>
+                </div>
+                <span id="intimacy-score" class="intimacy-score">0 / 200</span>
+            </div>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('home')">🏠 首页</button>
+            <button class="nav-tab" onclick="switchTab('tasks')">🎯 任务 <span id="task-badge" class="unread-badge" style="display: none;">!</span></button>
+            <button class="nav-tab" onclick="switchTab('calendar')">📆 日历</button>
+            <button class="nav-tab" onclick="switchTab('messages')">💬 消息 <span id="unread-badge" class="unread-badge">0</span></button>
+            <button class="nav-tab" onclick="switchTab('savings')">💰 储蓄</button>
+            <button class="nav-tab" onclick="switchTab('anniversary')">🎀 纪念日</button>
+            <button class="nav-tab" onclick="switchTab('profile')">👤 我的</button>
+            <button class="nav-tab" onclick="switchTab('timeline')">📅 时光轴</button>
+        </nav>
+
+        <main class="content" id="page-content">
+        </main>
+
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
