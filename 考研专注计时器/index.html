@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1E3A5F">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="考研专注计时器">
+    <meta name="description" content="考研党的专注计时神器">
+    <title>⏱️ 考研专注计时器</title>
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header class="app-header">
+            <h1>⏱️ 考研专注计时器</h1>
+        </header>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('timer')">⏱️ 计时</button>
+            <button class="nav-tab" onclick="switchTab('todos')">✅ 待办</button>
+            <button class="nav-tab" onclick="switchTab('records')">📊 记录</button>
+            <button class="nav-tab" onclick="switchTab('subjects')">📚 科目</button>
+            <button class="nav-tab" onclick="switchTab('settings')">⚙️ 设置</button>
+        </nav>
+
+        <main class="content" id="page-content">
+        </main>
+
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <div id="modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <template id="template-timer">
+<div class="timer-page">
+    <div class="timer-display">
+        <div class="timer-mode-select">
+            <button class="mode-btn active" data-mode="tomato" onclick="setTimerMode('tomato')">🍅 番茄钟</button>
+            <button class="mode-btn" data-mode="countup" onclick="setTimerMode('countup')">⏫ 正计时</button>
+            <button class="mode-btn" data-mode="countdown" onclick="setTimerMode('countdown')">⏬ 倒计时</button>
+            <button class="mode-btn" data-mode="segment" onclick="setTimerMode('segment')">📊 分段计时</button>
+        </div>
+        
+        <div class="timer-circle">
+            <div class="timer-time" id="timer-display">25:00</div>
+            <div class="timer-status" id="timer-status">准备开始</div>
+        </div>
+
+        <div class="timer-controls">
+            <button class="control-btn" id="btn-start" onclick="startTimer()">▶️ 开始</button>
+            <button class="control-btn" id="btn-pause" onclick="pauseTimer()" style="display:none;">⏸️ 暂停</button>
+            <button class="control-btn" id="btn-reset" onclick="resetTimer()">🔄 重置</button>
+            <button class="control-btn" id="btn-skip" onclick="skipSegment()" style="display:none;">⏭️ 跳过</button>
+        </div>
+
+        <div class="timer-quick-actions">
+            <button class="quick-action-btn" onclick="toggleMinimalMode()">🎯 极简模式</button>
+            <button class="quick-action-btn" onclick="toggleFocusLock()">🔒 专注锁定</button>
+        </div>
+
+        <div class="motivational-quote" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: clamp(12px, 4vw, 16px); padding: clamp(12px, 4vw, 20px); margin-bottom: clamp(16px, 5vw, 24px); text-align: center; color: white; font-size: clamp(0.85rem, 3.8vw, 1rem); line-height: 1.6; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+            <span id="motivational-quote"></span>
+        </div>
+        
+        <div class="timer-settings">
+            <div class="setting-group">
+                <label>选择科目</label>
+                <select id="timer-subject">
+                    <option value="">请选择科目</option>
+                </select>
+            </div>
+            <div class="setting-group" id="tomato-settings">
+                <label>学习时长（分钟）</label>
+                <input type="number" id="study-duration" value="25" min="5" max="120">
+            </div>
+            <div class="setting-group" id="rest-settings">
+                <label>休息时长（分钟）</label>
+                <input type="number" id="rest-duration" value="5" min="1" max="30">
+            </div>
+            <div class="setting-group" id="tomato-cycles-settings">
+                <label>番茄钟循环次数</label>
+                <input type="number" id="tomato-cycles" value="4" min="1" max="12">
+            </div>
+            <div class="setting-group" id="countdown-settings" style="display:none;">
+                <label>倒计时</label>
+                <div style="display: flex; gap: 10px; margin-top: 8px;">
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.8rem; color: #7F8C8D;">小时</label>
+                        <input type="number" id="countdown-hours" value="3" min="0" max="8" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.8rem; color: #7F8C8D;">分钟</label>
+                        <input type="number" id="countdown-minutes" value="0" min="0" max="59" style="width: 100%;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="font-size: 0.8rem; color: #7F8C8D;">秒</label>
+                        <input type="number" id="countdown-seconds" value="0" min="0" max="59" style="width: 100%;">
+                    </div>
+                </div>
+            </div>
+            <div class="setting-group" id="segment-settings" style="display:none;">
+                <label>分段设置</label>
+                <div id="segments-list" style="margin-bottom: 12px;"></div>
+                <button class="quick-action-btn" style="width:100%;" onclick="addSegment()">+ 添加分段</button>
+                <div style="margin-top:12px; display:flex; gap:8px;">
+                    <button class="quick-action-btn" style="flex:1;" onclick="loadPreset('kaoyan')">🎓 考研预设</button>
+                    <button class="quick-action-btn" style="flex:1;" onclick="loadPreset('custom')">📝 自定义</button>
+                </div>
+            </div>
+            <div class="setting-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="anti-distraction">
+                    <span>防打扰模式（切屏暂停）</span>
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+    </template>
+
+    <template id="template-records">
+<div class="records-page">
+    <div class="stats-summary">
+        <div class="stat-card">
+            <div class="stat-value" id="today-total">0h 0m</div>
+            <div class="stat-label">今日学习</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="week-total">0h 0m</div>
+            <div class="stat-label">本周学习</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="month-total">0h 0m</div>
+            <div class="stat-label">本月学习</div>
+        </div>
+    </div>
+    
+    <div class="efficiency-card" style="background: linear-gradient(135deg, #FF6B6B 0%, #FFD93D 100%); border-radius: clamp(16px, 5vw, 20px); padding: clamp(16px, 5vw, 24px); margin-bottom: clamp(16px, 5vw, 24px); text-align: center; box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);">
+        <div style="color: white; font-size: clamp(0.9rem, 4vw, 1rem); margin-bottom: clamp(6px, 2vw, 8px); font-weight: 600;">🎯 学习效率评分</div>
+        <div id="efficiency-score" style="color: white; font-size: clamp(2.5rem, 10vw, 3rem); font-weight: 800; margin-bottom: 4px;">50分</div>
+        <div id="efficiency-label" style="color: rgba(255,255,255,0.9); font-size: clamp(0.95rem, 4.2vw, 1.1rem); font-weight: 600;">继续加油</div>
+    </div>
+
+    <div class="chart-section">
+        <h3>📈 每日学习时长</h3>
+        <div class="chart-container" id="daily-chart"></div>
+    </div>
+
+    <div class="chart-section">
+        <h3>📊 科目分布</h3>
+        <div class="chart-container" id="subject-chart"></div>
+    </div>
+
+    <div class="records-list">
+        <h3>📝 学习记录</h3>
+        <div class="setting-group" style="margin-bottom: 16px;">
+            <label>日期筛选</label>
+            <select id="date-filter" style="margin-top: 8px; width: 100%;">
+                <option value="all">全部时间</option>
+                <option value="today">今天</option>
+                <option value="week">最近7天</option>
+                <option value="month">最近30天</option>
+                <option value="year">最近1年</option>
+                <option value="twoyears">最近2年</option>
+            </select>
+        </div>
+        <div id="records-list"></div>
+    </div>
+</div>
+    </template>
+
+    <template id="template-subjects">
+<div class="subjects-page">
+    <div class="subjects-header">
+        <h3>📚 我的科目</h3>
+        <button class="add-btn" onclick="openAddSubject()">+ 添加</button>
+    </div>
+    <div id="subjects-list" class="subjects-list"></div>
+</div>
+    </template>
+
+    <template id="template-todos">
+<div class="todos-page">
+    <div class="todos-header">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3>✅ 待办清单</h3>
+            <button class="add-btn" onclick="openAddTodo()">+ 添加</button>
+        </div>
+        <div class="todos-stats" style="display: flex; gap: 12px; margin-bottom: 16px;">
+            <div class="stat-card" style="flex: 1; padding: 12px; text-align: center;">
+                <div class="stat-value" id="todos-today-completed">0</div>
+                <div class="stat-label">今日已完成</div>
+            </div>
+            <div class="stat-card" style="flex: 1; padding: 12px; text-align: center;">
+                <div class="stat-value" id="todos-today-total">0</div>
+                <div class="stat-label">今日总任务</div>
+            </div>
+        </div>
+        <div class="todo-view-tabs" style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <button class="quick-action-btn active" data-view="today" onclick="setTodoView('today')">📅 今日</button>
+            <button class="quick-action-btn" data-view="all" onclick="setTodoView('all')">📋 全部</button>
+            <button class="quick-action-btn" data-view="completed" onclick="setTodoView('completed')">✅ 已完成</button>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <button class="quick-action-btn" onclick="clearCompletedTodos()">🗑️ 清理已完成</button>
+            <button class="quick-action-btn" onclick="clearAllTodos()">⚠️ 清空全部</button>
+        </div>
+    </div>
+    <div id="todos-list" class="todos-list"></div>
+</div>
+    </template>
+
+    <template id="template-settings">
+<div class="settings-page">
+    <div class="settings-section">
+        <h3>⏰ 提醒设置</h3>
+        <div class="setting-item">
+            <label>计时结束提醒</label>
+            <select id="reminder-sound">
+                <option value="default">默认铃声</option>
+                <option value="gentle">轻柔提示</option>
+                <option value="none">仅震动</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label class="checkbox-label">
+                <input type="checkbox" id="vibration" checked>
+                <span>震动提醒</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h3>🎨 外观设置</h3>
+        <div class="setting-item">
+            <label>主题模式</label>
+            <select id="theme-mode">
+                <option value="light">浅色模式</option>
+                <option value="dark">深色模式</option>
+                <option value="auto">跟随系统</option>
+            </select>
+        </div>
+        <div class="setting-item">
+            <label class="checkbox-label">
+                <input type="checkbox" id="minimal-mode">
+                <span>默认极简模式</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h3>🔒 专注设置</h3>
+        <div class="setting-item">
+            <label class="checkbox-label">
+                <input type="checkbox" id="focus-lock">
+                <span>专注锁定模式</span>
+            </label>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h3>📋 数据管理</h3>
+        <button class="action-btn" onclick="saveSettings()">💾 保存设置</button>
+        <button class="action-btn" onclick="exportData()">📤 导出数据</button>
+        <button class="action-btn" onclick="importData()">📥 导入数据</button>
+        <button class="action-btn danger" onclick="clearAllData()">🗑️ 清空数据</button>
+    </div>
+
+    <div class="settings-section">
+        <h3>💡 关于</h3>
+        <p>考研专注计时器 v1.2.0</p>
+        <p>专注学习，一战成硕！</p>
+    </div>
+</div>
+    </template>
+
+</body>
+</html>
